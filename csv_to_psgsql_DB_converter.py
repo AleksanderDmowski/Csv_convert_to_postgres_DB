@@ -48,7 +48,7 @@ def converter():
             pandas_names, pg_sql_names) in zip(df.columns, df.dtypes.replace(replacements)))
 
         conn = pg2.connect(dbname='fake_shops',
-                           user='postgres', password='1235')
+                           user='postgres', password='xxx')
         cursor = conn.cursor()
         print('db opened successfully')
 
