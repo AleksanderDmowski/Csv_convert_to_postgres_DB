@@ -1,10 +1,6 @@
 import pandas as pd
 import psycopg2 as pg2
 
-# Best practice for set files is select files with the same separator and from different folder
-file_bucket = [
-    r'C:\Users\xxx\xxxx']
-
 
 def convert_file_path_into_name(path='x', name_range=1, direct=0):
     if direct:
@@ -13,7 +9,7 @@ def convert_file_path_into_name(path='x', name_range=1, direct=0):
     name = path.split("\\")
     elements_in_list = len(name)
     if n >= elements_in_list:
-        return print('error')
+        print('error')
     return (' '.join(map(str, name[-n:]))).lower()
 
 
@@ -28,16 +24,15 @@ def replace_elements_in_table(text):
     return text.lower()
 
 
-def converter(password, sep=','):
-    print('convert')
+def converter(file_bucket, host, dbname, user, password, sep=','):
     for file_name in file_bucket:
         print(file_name)
         table_name = replace_elements_in_table(
             convert_file_path_into_name(file_name))
 
         df = pd.read_csv(file_name, sep=sep)
-        df_for_data_type_check = df.copy()
-        dfv = df_for_data_type_check.dropna()
+        dfv = df.copy()
+        dfv = dfv.dropna()
 
         for col in dfv.columns:
             if dfv[col].dtype == 'object':
@@ -63,10 +58,12 @@ def converter(password, sep=','):
         replaced_columns_type = ', '.join("{} {}".format(pandas_names, pg_sql_names) for (
             pandas_names, pg_sql_names) in zip(df.columns, dfv.dtypes.replace(replacements)))
 
-        conn = pg2.connect(dbname='fake_shops',
-                           user='postgres', password=password)
+        if host:
+            conn = pg2.connect(host=host, dbname=dbname,
+                               user=user, password=password)
+        else:
+            conn = pg2.connect(dbname=dbname, user=user, password=password)
         cursor = conn.cursor()
-        print('db opened successfully')
 
         cursor.execute(("drop table if exists {}").format(table_name))
         cursor.execute(("create table {}({})").format(
@@ -79,13 +76,8 @@ def converter(password, sep=','):
         SQL_STATEMENT = "COPY %s FROM STDIN WITH CSV HEADER DELIMITER AS ','"
 
         cursor.copy_expert(sql=SQL_STATEMENT % table_name, file=file_to_read)
-        print('file copied to db')
+        print('Copied to database')
 
         conn.commit()
         conn.close()
         cursor.close()
-
-
-run_app = True
-if run_app:
-    converter('x', sep=';')
