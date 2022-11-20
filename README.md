@@ -25,7 +25,7 @@ from csv_to_psgsql_DB_converter import converter
 ```
 
 ## Contributting
-Fell free to steal this code.
+Feel free to steal this code.
 
 ## My Links
 Check my [website](https://aleksanderdmowski.com/)
