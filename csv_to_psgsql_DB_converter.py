@@ -1,7 +1,7 @@
 import pandas as pd
 import psycopg2 as pg2
 import os
-# version 0.0.8
+# version 0.0.9
 
 
 def convert_file_path_into_name(path='x', name_range=1):
@@ -45,10 +45,10 @@ def converter(file_bucket, host, dbname, user, password, sep):
             print('File not found or inncorect name.')
             break
 
-        df_copy_for_values = df.copy().dropna()
+        df_copy_for_values = df.copy()
 
         for col in df_copy_for_values.columns:
-            if df_copy_for_values[col].dtype == 'object':
+            if df_copy_for_values[col].dropna().dtype == 'object':
                 try:
                     df_copy_for_values[col] = pd.to_datetime(
                         df_copy_for_values[col], format='%d.%m.%Y')
