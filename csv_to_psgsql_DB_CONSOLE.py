@@ -4,12 +4,17 @@ run_app = True
 if run_app:
     # list of files to convert
     file_bucket = [
-        r'path_to_file']
+        r'C:\path_to_file.csv']
     host = 0  # 0 is default value
-    dbname = 'database_name'
+    dbname = 'postgres'
     user = 'postgres'
-    password = 'xxx'
-    separator = ';'
+    password = '1111'
+    separator = ','
 
-    converter(file_bucket=file_bucket, host=host, dbname=dbname,
-              user=user, password=password, sep=separator)
+    converter(
+        file_bucket=file_bucket,
+        host=host,
+        dbname=dbname,
+        user=user,
+        password=password,
+        sep=separator)
