@@ -7,6 +7,7 @@ Script for converting csv file into postgresSQL database.
 ```bash
 pip install pandas
 pip install psycopg2
+pip install os
 ```
 
 ## Usage
@@ -26,6 +27,13 @@ from csv_to_psgsql_DB_converter import converter
 
 ## Contributting
 Feel free to steal this code.
+
+## Future
+Folder selection as source of files
+Posibility to convert excel files and txt files
+Window app
+Even more automation
+Documentation
 
 ## My Links
 Check my [website](https://aleksanderdmowski.com/)

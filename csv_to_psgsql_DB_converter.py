@@ -40,7 +40,7 @@ def converter(file_bucket, host, dbname, user, password, sep):
             convert_file_path_into_name(file_name))
 
         try:
-            df = pd.read_csv(file_name, sep=sep)
+            df = pd.read_csv(file_name, sep=sep, engine="python")
         except FileNotFoundError:
             print('File not found or inncorect name.')
             break
