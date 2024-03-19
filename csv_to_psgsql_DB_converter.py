@@ -1,11 +1,23 @@
 import os  # 3.11.3
+from typing import NoReturn, Callable
 import pandas as pd
 import psycopg2 as pg2
 
-# version 0.0.9
+# version 0.1.0
 
 
-def convert_file_path_into_name(path="x", name_range=1) -> str:
+def csv_file(path: str) -> str | NoReturn:
+    """Custom type hint"""
+    file_extension = path.split(".")[-1]
+    if file_extension == "csv":
+        return path
+    if file_extension != "csv":
+        raise TypeError("csv_file() must be a csv")
+    return None
+
+
+def convert_file_path_into_name(path: str, name_range: int = 1) -> str:  # to improve
+    """Add the info about"""
     if not os.path.isfile(path):
         return (path).lower()
     name = path.split("\\")
@@ -24,7 +36,7 @@ def list_of_string_elements_for_blank_character() -> list:
     return ["csv", "xlsx", ".txt", ":", ".", "$", "(", ")", "%", "&"]
 
 
-def replace_elements_for_correct_table_name(text) -> str:
+def replace_elements_for_correct_table_name(text: str) -> str:
     for elemnet in list_of_string_elements_for_underscore_character():
         text = text.replace(elemnet, "_")
     for elemnet in list_of_string_elements_for_blank_character():
@@ -32,14 +44,31 @@ def replace_elements_for_correct_table_name(text) -> str:
     return text.lower()
 
 
-def commit_and_close(conn, cursor, with_commit=1):
+def commit_and_close(conn, cursor, with_commit=1) -> Callable:  # to improve
     if with_commit:
         conn.commit()
     conn.close()
     cursor.close()
 
 
-def converter(file_bucket, host, dbname, user, password, sep):
+def replacements() -> dict:  # responsive varchar?
+    return {
+        "timedelta64[ns]": "VARCHAR(45)",
+        "object": "VARCHAR(45)",
+        "float64": "float",
+        "int64": "int",
+        "datetime64": "timestamp",
+        "datetime64[ns]": "timestamp",
+    }
+
+
+# Class login
+# def pgadmin_login(host: int, dbname: str, user: str, password: str, sep: None) -> list:
+#     return host, dbname, user, password, sep
+
+
+# Class converter
+def converter(file_bucket: list[csv_file], host, dbname, user, password, sep):
     for file_name in file_bucket:
         print(file_name)
         table_name = replace_elements_for_correct_table_name(
@@ -55,7 +84,7 @@ def converter(file_bucket, host, dbname, user, password, sep):
         df_copy_for_values = df.copy()
 
         for col in df_copy_for_values.columns:
-            if df_copy_for_values[col].dropna().dtype == "object":
+            if df_copy_for_values[col].dropna().dtype == "object":  # to improve
                 try:
                     df_copy_for_values[col] = pd.to_datetime(
                         df_copy_for_values[col], format="%d.%m.%Y"
@@ -70,25 +99,16 @@ def converter(file_bucket, host, dbname, user, password, sep):
             replace_elements_for_correct_table_name(columns) for columns in df.columns
         ]
 
-        replacements = {
-            "timedelta64[ns]": "VARCHAR(45)",
-            "object": "VARCHAR(45)",
-            "float64": "float",
-            "int64": "int",
-            "datetime64": "timestamp",
-            "datetime64[ns]": "timestamp",
-        }
-
         replaced_columns_type = ", ".join(
             "{} {}".format(pandas_names, pg_sql_names)
             for (pandas_names, pg_sql_names) in zip(
-                df.columns, df_copy_for_values.dtypes.replace(replacements)
+                df.columns, df_copy_for_values.dtypes.replace(replacements())
             )
         )
 
         if host:
             conn = pg2.connect(host=host, dbname=dbname, user=user, password=password)
-        else:
+        if not host:
             conn = pg2.connect(dbname=dbname, user=user, password=password)
         cursor = conn.cursor()
 
@@ -97,7 +117,7 @@ def converter(file_bucket, host, dbname, user, password, sep):
             cursor.execute(
                 ("create table {}({})").format(table_name, replaced_columns_type)
             )
-        except Exception:
+        except Exception:  # XD
             print("SyntaxError, probabbly you use wrong sepparator.")
             commit_and_close(conn, cursor, 0)
             break
@@ -112,8 +132,12 @@ def converter(file_bucket, host, dbname, user, password, sep):
             ("{}").format(convert_file_path_into_name(file_name)), encoding="utf-8"
         )
 
-        SQL_STATEMENT = "COPY %s FROM STDIN WITH CSV HEADER DELIMITER AS ','"
+        sql_statement = "COPY %s FROM STDIN WITH CSV HEADER DELIMITER AS ','"
 
-        cursor.copy_expert(sql=SQL_STATEMENT % table_name, file=file_to_read)
+        cursor.copy_expert(sql=sql_statement % table_name, file=file_to_read)
         print("Copied to database")
         commit_and_close(conn, cursor)
+
+
+if __name__ == "__main__":
+    pass

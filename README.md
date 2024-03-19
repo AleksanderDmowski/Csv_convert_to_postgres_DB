@@ -1,6 +1,8 @@
-# Csv_convert_to_postgres_DB
+# Csv_convert_to_postgre_DB
 
-Script for converting csv file into postgresSQL database.
+Script for converting csv file into postgreSQL database.
+
+19.03.2024 I'm working right now on clean code :)
 
 ## Requirements
 
