@@ -3,7 +3,7 @@ from typing import NoReturn, Callable
 import pandas as pd
 import psycopg2 as pg2
 
-# version 0.1.0
+# version 0.11.0
 
 
 def csv_file(path: str) -> str | NoReturn:

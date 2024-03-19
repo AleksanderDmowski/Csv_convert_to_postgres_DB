@@ -1,8 +1,7 @@
 from csv_to_psgsql_db_converter import converter
 
-RUN_APP = True
 
-if RUN_APP:
+def app():
     # list of files to convert
     file_bucket = [r"C:\Users\path_to\file_name.csv"]
     host = 0  # 0 is default value
@@ -19,3 +18,7 @@ if RUN_APP:
         password=password,
         sep=separator,
     )
+
+
+if __name__ == "__main__":
+    app()
